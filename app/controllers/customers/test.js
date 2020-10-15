@@ -45,6 +45,7 @@ describe('Customers', () => {
     it('should return error message of duplicate email', async () => {
       const result = await CustomersController.create(newCustomer);
       expect(typeof result).to.equal('object');
+      expect(result.statusCode).to.equal(400);
     });
   });
 
@@ -85,6 +86,7 @@ describe('Customers', () => {
         _id: '5f86e995a94d01698262c54c',
       });
       expect(typeof result).to.equal('object');
+      expect(result.statusCode).to.equal(400);
     });
   });
 
@@ -97,6 +99,11 @@ describe('Customers', () => {
           expect(result.data[prop]).to.equal(updCustomer[prop]);
         else expect(result.data[prop]).to.equal(newCustomer[prop]);
       }
+    });
+    it('should return error message of customer not found', async () => {
+      const result = await CustomersController.deleteCustomer({ _id });
+      expect(typeof result).to.equal('object');
+      expect(result.statusCode).to.equal(400);      
     });
   });
 });
