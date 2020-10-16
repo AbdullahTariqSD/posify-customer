@@ -14,6 +14,14 @@ const getAllCustomers = async (event, context) => {
   let response = await CustomersController.all();
   return send(response);
 };
+const sns_check = async (event, context) => {
+  let response = await CustomersController.sns_check();
+  return true;
+};
+const sqs_check = async (event, context) => {
+  let response = await CustomersController.sqs_check();
+  return true;
+};
 const getCustomer = async (event, context) => {
   console.log('event.Record', event.pathParameters);
   let response = await CustomersController.getCustomer(event.pathParameters);
@@ -23,7 +31,13 @@ const getCustomer = async (event, context) => {
 const createCustomer = async (event, context) => {
   const request = formatBody(event);
   console.log('event.Record', request);
-  let response = await CustomersController.create(request.body);
+  console.log('request.body', request.body);
+  console.log('request.source', request.source);
+  let response = await CustomersController.create(
+    request.source == 'sns'
+      ? JSON.parse(request.body.Sns.Message)
+      : request.body
+  );
   return send(response);
 };
 const deleteCustomer = async (event, context) => {
@@ -53,4 +67,6 @@ module.exports = {
   update: updateCustomer,
   getCustomer,
   deleteCustomerSns,
+  sqs_check,
+  sns_check,
 };

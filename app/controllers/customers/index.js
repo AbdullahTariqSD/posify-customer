@@ -1,9 +1,11 @@
 const SNS = require('../../utils/sns');
-const { snsTopics } = require('../../config/keys');
+const { snsTopics, aws } = require('../../config/keys');
+const faker = require('faker');
 
-// const sns = SNS({
-//   isOffline: true, // Only required for CLI testing, in app it will pick this automaticlally
-// });
+const sns = SNS({
+  awsAccessKeyId: aws.accessKeyId,
+  awsSecretKey: aws.secretKey,
+});
 const sqs = SNS({
   isOffline: false, // Only required for CLI testing, in app it will pick this automaticlally
   isSqs: true,
@@ -99,39 +101,6 @@ const deleteCustomer = async ({ _id }) => {
       { _id },
       { rawResult: true }
     );
-    await sqs
-      .sendMessage({
-        MessageBody: JSON.stringify({
-          to: 'abdullah.tariq@shopdev.co',
-          body: {
-            text: 'hello buddy',
-            htmlData: [
-              {
-                A: 'a',
-                B: 'b',
-                C: 'c',
-              },
-              {
-                A: 'a',
-                B: 'b',
-                C: 'c',
-              },
-            ],
-          },
-        }),
-        QueueUrl: `https://sqs.us-east-1.amazonaws.com/${process.env.awsAccountId}/posifyEmailQueue`,
-      })
-      .promise()
-      .then((r) => console.log(r));
-    // sns
-    //   .publish({
-    //     Message: JSON.stringify({ hello: 'hello' }),
-    //     Subject: 'snsCustomerDeleteTopic',
-    //     TopicArn: snsTopics.productCreated,
-    //   })
-    //   .promise()
-    //   .then((r) => console.log(r))
-    //   .catch((e) => {});
     if (value) {
       return { statusCode: 200, data: value };
     }
@@ -141,6 +110,48 @@ const deleteCustomer = async ({ _id }) => {
     console.log(err);
     return { statusCode: 400, message: err };
   }
+};
+const sns_check = async (body) => {
+  sns
+    .publish({
+      Message: JSON.stringify({
+        firstName: faker.name.findName(),
+        lastName: faker.name.findName(),
+        email: faker.internet.email(),
+        phone: '03338181333',
+      }),
+      Subject: 'snsCustomerDeleteTopic',
+      TopicArn: snsTopics.customerCreated,
+    })
+    .promise()
+    .then((r) => console.log(r))
+    .catch((e) => {});
+};
+const sqs_check = async (body) => {
+  await sqs
+    .sendMessage({
+      MessageBody: JSON.stringify({
+        to: 'abdullah.tariq@shopdev.co',
+        body: {
+          text: 'hello buddy',
+          htmlData: [
+            {
+              A: 'a',
+              B: 'b',
+              C: 'c',
+            },
+            {
+              A: 'a',
+              B: 'b',
+              C: 'c',
+            },
+          ],
+        },
+      }),
+      QueueUrl: `https://sqs.us-east-1.amazonaws.com/${process.env.awsAccountId}/posifyEmailQueue`,
+    })
+    .promise()
+    .then((r) => console.log(r));
 };
 const updateCustomer = async ({ _id, ...updCustomer }) => {
   try {
@@ -167,4 +178,6 @@ module.exports = {
   deleteCustomer,
   updateCustomer,
   getCustomer,
+  sns_check,
+  sqs_check,
 };

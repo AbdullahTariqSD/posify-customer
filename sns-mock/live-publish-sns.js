@@ -13,7 +13,7 @@ sns
       name: 'KHIZER',
     }),
     Subject: 'ProductCreate',
-    TopicArn: snsTopics.productCreated,
+    TopicArn: snsTopics.customerCreated,
   })
   .promise()
   .then((r) => console.log(r));

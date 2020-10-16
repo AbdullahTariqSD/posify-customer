@@ -15,7 +15,7 @@ provider:
       Action:
         - 'sns:Publish'
       Resource:
-        - ${env:snsProductCreatedTopic}
+        - ${env:snsCustomerCreatedTopic}
     - Effect: "Allow"
       Action:
         - "sqs:SendMessage"
@@ -59,7 +59,7 @@ custom:
     awsAccessKeyId: ${env:awsAccessKeyId}
     awsSecretKey: ${env:awsSecretKey}
     awsAccountId: ${env:awsAccountId}
-    snsProductCreatedTopic: ${env:snsProductCreatedTopic}
+    snsCustomerCreatedTopic: ${env:snsCustomerCreatedTopic}
 
 functions:
   count:
@@ -86,6 +86,8 @@ functions:
       - http:
           path: customers/create
           method: post
+      - sns:
+          arn: ${env:snsCustomerCreatedTopic}
   delete:
     handler: handler.delete
     events:
@@ -102,4 +104,16 @@ functions:
     handler: handler.deleteCustomerSns
     events:
       - sns:
-          arn: ${env:snsProductCreatedTopic}
+          arn: ${env:snsCustomerCreatedTopic}
+  sqs_check:
+    handler: handler.sqs_check
+    events:
+      - http:
+          path: customers/sqs_check
+          method: get
+  sns_check:
+    handler: handler.sns_check
+    events:
+      - http:
+          path: customers/sns_check
+          method: get
