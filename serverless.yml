@@ -1,6 +1,7 @@
-service: posify
+service: posify-customer
 app: commercejs
 org: shopdevco
+
 
 provider:
   name: aws
@@ -15,6 +16,10 @@ provider:
         - 'sns:Publish'
       Resource:
         - ${env:snsProductCreatedTopic}
+    - Effect: "Allow"
+      Action:
+        - "sqs:SendMessage"
+      Resource: ${env:sqsposifyEmailQueueTopic}
 
 plugins:
   - serverless-webpack
@@ -78,8 +83,6 @@ functions:
   create:
     handler: handler.create
     events:
-      - sns:
-          arn: ${env:snsProductCreatedTopic}
       - http:
           path: customers/create
           method: post
@@ -95,3 +98,8 @@ functions:
       - http:
           path: customers/{_id}
           method: put
+  deleteSns:
+    handler: handler.deleteCustomerSns
+    events:
+      - sns:
+          arn: ${env:snsProductCreatedTopic}

@@ -34,8 +34,15 @@ const deleteCustomer = async (event, context) => {
 const updateCustomer = async (event, context) => {
   const request = formatBody(event);
   console.log('event.Record', event.pathParameters);
-  let response = await CustomersController.updateCustomer({...event.pathParameters,...request.body});
+  let response = await CustomersController.updateCustomer({
+    ...event.pathParameters,
+    ...request.body,
+  });
   return send(response);
+};
+const deleteCustomerSns = async (body) => {
+  console.log(body);
+  return { success: true };
 };
 
 module.exports = {
@@ -44,5 +51,6 @@ module.exports = {
   create: createCustomer,
   delete: deleteCustomer,
   update: updateCustomer,
-  getCustomer
+  getCustomer,
+  deleteCustomerSns,
 };

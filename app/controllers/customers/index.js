@@ -1,3 +1,14 @@
+const SNS = require('../../utils/sns');
+const { snsTopics } = require('../../config/keys');
+
+// const sns = SNS({
+//   isOffline: true, // Only required for CLI testing, in app it will pick this automaticlally
+// });
+const sqs = SNS({
+  isOffline: false, // Only required for CLI testing, in app it will pick this automaticlally
+  isSqs: true,
+});
+
 const { Customer } = require('../../models');
 const { customerSchema, customerUpdSchema } = require('../../utils/validator');
 const axios = require('axios');
@@ -9,7 +20,7 @@ const all = async () => {
     return { data: customers };
   } catch (err) {
     console.log(err);
-    return { statusCode: 500, message: err.message };
+    return { statusCode: 400, message: err.message };
   }
 };
 
@@ -22,7 +33,7 @@ const getCustomer = async ({ _id }) => {
     return { message: 'No record found.' };
   } catch (err) {
     console.log(err);
-    return { statusCode: 500, message: err.message };
+    return { statusCode: 400, message: err.message };
   }
 };
 
@@ -32,7 +43,7 @@ const count = async () => {
     return { data: { count: customerCount } };
   } catch (err) {
     console.log(err);
-    return { statusCode: 500, message: err.message };
+    return { statusCode: 400, message: err.message };
   }
 };
 
@@ -76,7 +87,7 @@ const create = async (body) => {
     return { statusCode: 200, data };
   } catch (err) {
     console.log(err);
-    return { statusCode: 500, message: err.message };
+    return { statusCode: 400, message: err.message };
   }
 };
 
@@ -88,11 +99,47 @@ const deleteCustomer = async ({ _id }) => {
       { _id },
       { rawResult: true }
     );
-    if (value) return { statusCode: 200, data: value };
+    await sqs
+      .sendMessage({
+        MessageBody: JSON.stringify({
+          to: 'abdullah.tariq@shopdev.co',
+          body: {
+            text: 'hello buddy',
+            htmlData: [
+              {
+                A: 'a',
+                B: 'b',
+                C: 'c',
+              },
+              {
+                A: 'a',
+                B: 'b',
+                C: 'c',
+              },
+            ],
+          },
+        }),
+        QueueUrl: `https://sqs.us-east-1.amazonaws.com/${process.env.awsAccountId}/posifyEmailQueue`,
+      })
+      .promise()
+      .then((r) => console.log(r));
+    // sns
+    //   .publish({
+    //     Message: JSON.stringify({ hello: 'hello' }),
+    //     Subject: 'snsCustomerDeleteTopic',
+    //     TopicArn: snsTopics.productCreated,
+    //   })
+    //   .promise()
+    //   .then((r) => console.log(r))
+    //   .catch((e) => {});
+    if (value) {
+      return { statusCode: 200, data: value };
+    }
+
     return { statusCode: 400, message: 'No record found.' };
   } catch (err) {
     console.log(err);
-    return { statusCode: 500, message: err.message };
+    return { statusCode: 400, message: err };
   }
 };
 const updateCustomer = async ({ _id, ...updCustomer }) => {
@@ -109,7 +156,7 @@ const updateCustomer = async ({ _id, ...updCustomer }) => {
     return { statusCode: 400, message: 'No record found.' };
   } catch (err) {
     console.log(err);
-    return { statusCode: 500, message: err.message };
+    return { statusCode: 400, message: err.message };
   }
 };
 

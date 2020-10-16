@@ -1,8 +1,9 @@
 const AWS = require('aws-sdk');
 const keys = require('../config/keys');
 
-module.exports = ({ isOffline, awsAccessKeyId, awsSecretKey }) => {
+module.exports = ({ isOffline, awsAccessKeyId, awsSecretKey, isSqs }) => {
   isOffline = typeof isOffline !== 'undefined' ? isOffline : keys.isOffline;
+  isSqs = typeof isOffline !== 'undefined' ? isSqs : false;
 
   let opts = {
     region: keys.aws.region,
@@ -21,5 +22,5 @@ module.exports = ({ isOffline, awsAccessKeyId, awsSecretKey }) => {
     };
   }
 
-  return new AWS.SNS(opts);
+  return isSqs ? new AWS.SQS(opts) : new AWS.SNS(opts);
 };
