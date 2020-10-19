@@ -100,11 +100,6 @@ functions:
       - http:
           path: customers/{_id}
           method: put
-  deleteSns:
-    handler: handler.deleteCustomerSns
-    events:
-      - sns:
-          arn: ${env:snsCustomerCreatedTopic}
   sqs_check:
     handler: handler.sqs_check
     events:
