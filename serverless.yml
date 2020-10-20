@@ -60,6 +60,7 @@ custom:
     awsSecretKey: ${env:awsSecretKey}
     awsAccountId: ${env:awsAccountId}
     snsCustomerCreatedTopic: ${env:snsCustomerCreatedTopic}
+    sqsposifyEmailQueueTopic: ${env:sqsposifyEmailQueueTopic}
 
 functions:
   count:

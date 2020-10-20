@@ -3,8 +3,8 @@ const { snsTopics, aws } = require('../../config/keys');
 const faker = require('faker');
 
 const sns = SNS({
-  awsAccessKeyId: aws.accessKeyId,
-  awsSecretKey: aws.secretKey,
+  isOffline: false, // Only required for CLI testing, in app it will pick this automaticlally
+  isSqs: false,
 });
 const sqs = SNS({
   isOffline: false, // Only required for CLI testing, in app it will pick this automaticlally
@@ -112,7 +112,7 @@ const deleteCustomer = async ({ _id }) => {
   }
 };
 const sns_check = async (body) => {
-  sns
+  await sns
     .publish({
       Message: JSON.stringify({
         firstName: faker.name.findName(),
@@ -125,7 +125,7 @@ const sns_check = async (body) => {
     })
     .promise()
     .then((r) => console.log(r))
-    .catch((e) => {});
+    .catch((e) => console.log('Error in SNS:', e));
 };
 const sqs_check = async (body) => {
   await sqs

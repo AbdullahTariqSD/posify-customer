@@ -19,12 +19,12 @@ const getAllCustomers = async (event, context) => {
 const sns_check = async (event, context) => {
   createConnection();
   let response = await CustomersController.sns_check();
-  return true;
+  return send(true);
 };
 const sqs_check = async (event, context) => {
   createConnection();
   let response = await CustomersController.sqs_check();
-  return true;
+  return send(true);
 };
 const getCustomer = async (event, context) => {
   createConnection();
@@ -60,7 +60,6 @@ const updateCustomer = async (event, context) => {
   });
   return send(response);
 };
-
 
 module.exports = {
   count: countCustomers,
