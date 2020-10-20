@@ -2,7 +2,6 @@ service: posify-customer
 app: commercejs
 org: shopdevco
 
-
 provider:
   name: aws
   runtime: nodejs12.x
@@ -16,9 +15,9 @@ provider:
         - 'sns:Publish'
       Resource:
         - ${env:snsCustomerCreatedTopic}
-    - Effect: "Allow"
+    - Effect: 'Allow'
       Action:
-        - "sqs:SendMessage"
+        - 'sqs:SendMessage'
       Resource: ${env:sqsposifyEmailQueueTopic}
 
 plugins:
@@ -101,15 +100,3 @@ functions:
       - http:
           path: customers/{_id}
           method: put
-  sqs_check:
-    handler: handler.sqs_check
-    events:
-      - http:
-          path: customers/sqs_check
-          method: get
-  sns_check:
-    handler: handler.sns_check
-    events:
-      - http:
-          path: customers/sns_check
-          method: get

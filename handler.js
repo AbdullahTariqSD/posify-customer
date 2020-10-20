@@ -16,16 +16,6 @@ const getAllCustomers = async (event, context) => {
   let response = await CustomersController.all();
   return send(response);
 };
-const sns_check = async (event, context) => {
-  createConnection();
-  let response = await CustomersController.sns_check();
-  return send(true);
-};
-const sqs_check = async (event, context) => {
-  createConnection();
-  let response = await CustomersController.sqs_check();
-  return send(true);
-};
 const getCustomer = async (event, context) => {
   createConnection();
   console.log('event.Record', event.pathParameters);
@@ -68,6 +58,4 @@ module.exports = {
   delete: deleteCustomer,
   update: updateCustomer,
   getCustomer,
-  sqs_check,
-  sns_check,
 };

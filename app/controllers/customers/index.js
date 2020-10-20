@@ -1,19 +1,6 @@
-const SNS = require('../../utils/sns');
-const { snsTopics, aws } = require('../../config/keys');
-const faker = require('faker');
-
-const sns = SNS({
-  isOffline: false, // Only required for CLI testing, in app it will pick this automaticlally
-  isSqs: false,
-});
-const sqs = SNS({
-  isOffline: false, // Only required for CLI testing, in app it will pick this automaticlally
-  isSqs: true,
-});
-
 const { Customer } = require('../../models');
 const { customerSchema, customerUpdSchema } = require('../../utils/validator');
-const axios = require('axios');
+
 const mongoose = require('mongoose');
 
 const all = async () => {
@@ -50,10 +37,6 @@ const count = async () => {
 };
 
 const create = async (body) => {
-  // let resp = await axios.post(
-  //   'https://webhook.site/7aa41b8d-ca61-4202-ba7c-fcf6850dcc44',
-  //   { source, body }
-  // );
   try {
     const {
       firstName,
@@ -111,48 +94,6 @@ const deleteCustomer = async ({ _id }) => {
     return { statusCode: 400, message: err };
   }
 };
-const sns_check = async (body) => {
-  await sns
-    .publish({
-      Message: JSON.stringify({
-        firstName: faker.name.findName(),
-        lastName: faker.name.findName(),
-        email: faker.internet.email(),
-        phone: '03338181333',
-      }),
-      Subject: 'snsCustomerDeleteTopic',
-      TopicArn: snsTopics.customerCreated,
-    })
-    .promise()
-    .then((r) => console.log(r))
-    .catch((e) => console.log('Error in SNS:', e));
-};
-const sqs_check = async (body) => {
-  await sqs
-    .sendMessage({
-      MessageBody: JSON.stringify({
-        to: 'abdullah.tariq@shopdev.co',
-        body: {
-          text: 'hello buddy',
-          htmlData: [
-            {
-              A: 'a',
-              B: 'b',
-              C: 'c',
-            },
-            {
-              A: 'a',
-              B: 'b',
-              C: 'c',
-            },
-          ],
-        },
-      }),
-      QueueUrl: `https://sqs.us-east-1.amazonaws.com/${process.env.awsAccountId}/posifyEmailQueue`,
-    })
-    .promise()
-    .then((r) => console.log(r));
-};
 const updateCustomer = async ({ _id, ...updCustomer }) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(_id))
@@ -178,6 +119,4 @@ module.exports = {
   deleteCustomer,
   updateCustomer,
   getCustomer,
-  sns_check,
-  sqs_check,
 };
